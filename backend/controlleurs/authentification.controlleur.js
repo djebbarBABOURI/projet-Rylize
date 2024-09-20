@@ -95,6 +95,17 @@ export const connecter = async (req, res) => {
 };
 
 
-export const deconnecter=(req, res)=>{
-    console.log("déconnecter");
-}
+export const deconnecter = (req, res) => {
+    try {
+        // Suppression du cookie contenant le token JWT en le remplaçant par une chaîne vide et en définissant une durée d'expiration immédiate
+        res.cookie("jwt", "", { maxAge: 0 });
+
+        // Envoi d'une réponse avec un message de confirmation de la déconnexion
+        res.status(200).json({ message: "Déconnexion faite avec succès" });
+
+    } catch (error) {
+        // Gestion des erreurs et envoi d'une réponse d'erreur en cas de problème serveur
+        console.log("Erreur dans la méthode 'deconnecter' ", error.message);
+        res.status(500).json({ error: "Erreur interne de serveur" });
+    }
+};

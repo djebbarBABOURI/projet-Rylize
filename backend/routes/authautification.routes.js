@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.post("/inscription",inscrir);
 router.post("/connection",connecter);
-router.get("/deconnexion",deconnecter);
+router.post("/deconnexion",deconnecter);
 
 export default router;
