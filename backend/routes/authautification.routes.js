@@ -4,7 +4,7 @@ import { connecter, deconnecter, inscrir } from "../controlleurs/authentificatio
 const router = express.Router();
 
 router.post("/inscription",inscrir);
-router.get("/connection",connecter);
+router.post("/connection",connecter);
 router.get("/deconnexion",deconnecter);
 
 export default router;
