@@ -12,10 +12,16 @@ function App() {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-
+      <div className=''>
+        <Toaster
+          position="top-right"
+          reverseOrder={false}
+          containerStyle={{ zIndex: 1001 }}
+        />
+      </div>
       {/* Conteneur pour le contenu qui doit être centré */}
       <div className="h-full w-full flex-grow flex items-center justify-center p-4">
-        <div><Toaster /></div>
+
         <Routes>
           <Route path='/' element={authUtilisateur ? <Home /> : <Navigate to={"/connexion"} />} />
           <Route path='/inscription' element={authUtilisateur ? <Navigate to='/' /> : <Inscription />} />

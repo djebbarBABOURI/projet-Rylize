@@ -3,15 +3,62 @@ import { useAuthContext } from "../../context/UtilisateurAuthContext";
 import { useState } from "react";
 import InsForm from "../inscription/InsForm.jsx";
 import ImageProfil from "./ImageProfil.jsx";
-
+import AlertHandling from "./AlertHandling.jsx";
+//import toast from "react-hot-toast";
 const Profil = () => {
-    const { authUtilisateur } = useAuthContext();
+    const { authUtilisateur, setAuthUtilisateur } = useAuthContext();
     const [inputs, setInputs] = useState({
         nom: authUtilisateur.nom,
         prenom: authUtilisateur.prenom,
         email: authUtilisateur.email,
         adresse: authUtilisateur.adresse,
     });
+
+    const [modifHasError, setModifHasError] = useState({
+        hasError: null,
+        message: null,
+    });
+
+
+
+    function handleInputErrorsModif(nom, prenom, email, adresse) {
+        if (!nom || !prenom || !email || !adresse) {
+            setModifHasError({ hasError: true, message: 'Vous devez remplir tout les champs du formulaire !' });
+            return false;
+        }
+        return true;
+    }
+
+
+    const handlePatchUpdate = async (e) => {
+        e.preventDefault();
+
+        try {
+            if (handleInputErrorsModif(inputs.nom, inputs.prenom, inputs.email, inputs.adresse)) {
+                // eslint-disable-next-line no-unused-vars
+                const response = await fetch(`api/utilisateur/modifUtilisateur/${authUtilisateur._id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        nom: inputs.nom,
+                        prenom: inputs.prenom,
+                        email: inputs.email,
+                        adresse: inputs.adresse
+                    })
+                }).then((res) => res.json())
+                    .then((data) => { setAuthUtilisateur(data); localStorage.setItem("Auth-Utilisateur", JSON.stringify(data)); setModifHasError({ hasError: false, message: 'Modification du profil a été faite avec succés!' }); })
+
+            }
+
+
+        } catch (error) {
+            console.error('Erreur lors de la mise à jour :', error);
+        }
+    };
+
+
 
     return (
         <>
@@ -84,18 +131,15 @@ const Profil = () => {
 
 
 
-
-
-
                 <dialog id="my_modal_4" className="modal">
-
                     <div className="modal-box w-11/12 max-w-5xl">
                         <form method="dialog">
                             {/* if there is a button in form, it will close the modal */}
                             <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                         </form>
                         <br />
-                        <form className="flex flex-col md:flex-row">
+
+                        <form className="flex flex-col md:flex-row" onSubmit={(e) => { handlePatchUpdate(e) }}>
 
 
                             {/* ImageProfil à droite */}
@@ -106,13 +150,17 @@ const Profil = () => {
                             {/* InsForm à gauche */}
                             <div className="flex-[0.8]">
                                 <InsForm inputs={inputs} setInputs={setInputs} isInscription={false} />
+                                <div>
+                                    <AlertHandling modifHasError={modifHasError} classM="modifAfficheError" />
+                                </div>
                                 <div className="flex justify-end mt-6 space-x-2">
-                                    <button className="btn">Modifier</button>
+                                    <button className="btn" type="submit">Modifier</button>
                                     <form method="dialog" className="flex justify-end">
                                         {/* if there is a button, it will close the modal */}
                                         <button className="btn">Fermer</button>
                                     </form>
                                 </div>
+
                             </div>
 
                         </form>
@@ -128,5 +176,4 @@ const Profil = () => {
 
     );
 };
-
 export default Profil;
