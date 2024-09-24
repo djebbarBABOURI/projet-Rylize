@@ -60,9 +60,9 @@ export const Navbar = () => {
                         {authUtilisateur ? (
                             <>
                                 <li className="inline-flex">
-                                    <a>
+                                    <Link to={'/profil'}>
                                         <ImProfile className="mr-2" />  Profile
-                                    </a>
+                                    </Link>
                                 </li>
                                 <li><BoutonDeconnexion /></li>
                             </>
