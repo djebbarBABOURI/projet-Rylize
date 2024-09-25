@@ -45,7 +45,8 @@ export const inscrir = async (req, res) => {
                 nom: nom,
                 prenom: prenom,
                 email: email,
-                adresse: adresse
+                adresse: adresse,
+                imgProfil: "",
             });
         }
 
@@ -59,21 +60,21 @@ export const inscrir = async (req, res) => {
 
 export const connecter = async (req, res) => {
     try {
-        const {email, mdp} = req.body;
+        const { email, mdp } = req.body;
 
         // Recherche de l'utilisateur dans la base de données
-        const utilisateur = await Utilisateur.findOne({email});
-        
+        const utilisateur = await Utilisateur.findOne({ email });
+
         // Vérification si l'utilisateur existe
         if (!utilisateur) {
-            return res.status(400).json({error: "Email ou mot de passe sont invalides"});
+            return res.status(400).json({ error: "Email ou mot de passe sont invalides" });
         }
 
         // Comparaison des mots de passe
         const mdpCorrect = await bcryptjs.compare(mdp, utilisateur.mdp);
 
         if (!mdpCorrect) {
-            return res.status(400).json({error: "Email ou mot de passe sont invalides"});
+            return res.status(400).json({ error: "Email ou mot de passe sont invalides" });
         }
 
         // Génération du token et configuration du cookie
@@ -85,12 +86,13 @@ export const connecter = async (req, res) => {
             nom: utilisateur.nom,
             prenom: utilisateur.prenom,
             email: utilisateur.email,
-            adresse: utilisateur.adresse
+            adresse: utilisateur.adresse,
+            imgProfil: utilisateur.imgProfil,
         });
 
     } catch (error) {
         console.log("Erreur dans la méthode 'connecter' ", error.message);
-        res.status(500).json({error: "Erreur interne de serveur"});
+        res.status(500).json({ error: "Erreur interne de serveur" });
     }
 };
 

@@ -50,8 +50,8 @@ export const Navbar = () => {
                 </button>
                 <div className="dropdown dropdown-end">
                     <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                        <div className="w-10 rounded-full">
-                            <CgProfile className="w-full h-full" />
+                        <div className="w-16 rounded-full">
+                            {authUtilisateur && authUtilisateur.imgProfil ? (<img src={`${authUtilisateur.imgProfil}`} alt="imag profil" className="rounded-full w-full h-full max-w-xs md:max-w-md lg:max-w-lg border-4 border-blue-500 p-1" />) : (<CgProfile className="w-full h-full" />)}
                         </div>
                     </div>
                     <ul
