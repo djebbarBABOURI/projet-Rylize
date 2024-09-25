@@ -5,13 +5,15 @@ import Connexion from '/src/pages/connexion/Connexion.jsx';
 import Inscription from '/src/pages/inscription/Inscription.jsx';
 import { Toaster } from 'react-hot-toast';
 import { useAuthContext } from "./context/UtilisateurAuthContext";
-import Home from './pages/home/home';
+import Home from './pages/home/Home.jsx';
 import Profil from './pages/Profil/Profil.jsx';
+// import Navigation from './components/navbar/Navigation.jsx';
 function App() {
   const { authUtilisateur } = useAuthContext();
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
+      {/* <Navigation /> */}
       <div className=''>
         <Toaster
           position="top-right"
