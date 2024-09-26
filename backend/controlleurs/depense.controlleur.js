@@ -67,3 +67,21 @@ export const getDepensesUtilisateur = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+
+
+
+export const deleteDepenses = async (req, res) => {
+    try {
+        const { ids } = req.body; // Recevoir les IDs des dépenses à supprimer
+        await Depense.deleteMany({ _id: { $in: ids } }); // Supprimer les dépenses avec les IDs correspondants
+        res.status(200).json({ message: "Dépenses supprimées avec succès !" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+
+}
+
+
+

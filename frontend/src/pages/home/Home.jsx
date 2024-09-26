@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import DepenseForm from "../depense/DepenseForm.jsx";
-import TableauDepense from "../../components/TableauDepense.jsx"; // Assurez-vous d'importer le composant ici
+import TableauDepense from "../../components/TableauDepense.jsx";
 import toast from "react-hot-toast";
 
 const Home = () => {
@@ -58,22 +58,50 @@ const Home = () => {
         document.getElementById('my_modal_4').showModal();
     };
 
+    const handleDelete = async (ids) => {
+        try {
+            const res = await fetch(`/api/depenses/deleteDepenses/`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ids }),
+            });
+
+            if (!res.ok) {
+                throw new Error(`Erreur: ${res.status} - ${res.statusText}`);
+            }
+
+            toast.success("Dépenses supprimées avec succès !");
+            loadData(); // Recharger la liste des dépenses
+        } catch (error) {
+            console.error(error.message);
+            toast.error(error.message);
+        }
+    };
+
+    // Méthode pour gérer l'ajout d'une nouvelle dépense
+    const handleAdd = () => {
+        setIsAjoutDepense(true);  // On est en mode ajout
+        setDepenseSelected(null); // Réinitialiser la dépense sélectionnée
+        document.getElementById('my_modal_4').showModal(); // Ouvrir le modal
+    };
+
     return (
         <div className='w-full md:flex-row p-4 bg-white shadow-lg rounded-lg max-w-4xl mx-auto'>
             <div className="w-full mb-4">
                 <h2 className="font-bold text-xl w-full">Liste des dépenses</h2>
                 <hr className="border-t-2 border-gray-300 mt-2" />
             </div>
-            <button
-                onClick={() => { setIsAjoutDepense(true); document.getElementById('my_modal_4').showModal(); }}
-                className='btn h-10 mt-4 border border-transparent bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition duration-200'>
-                Ajouter
-            </button>
 
             {loadingDepenses ? (
                 <p>Chargement des dépenses...</p>
             ) : (
-                <TableauDepense listDepense={listDepense} formatDate={formatDate} onEdit={handleEdit} />
+                <TableauDepense
+                    listDepense={listDepense}
+                    formatDate={formatDate}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete} // Passer la méthode de suppression
+                    onAdd={handleAdd}
+                />
             )}
 
             <dialog id="my_modal_4" className="modal">
