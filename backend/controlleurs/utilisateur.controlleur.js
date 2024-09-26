@@ -5,8 +5,6 @@ export const modifUtilisateur = async (req, res) => {
         const id_utilisateur = req.params.id;
         const utilisateurId = req.utilisateur.id_utilisateur;
 
-        console.log(id_utilisateur, utilisateurId);
-
         const updatedUtilisateur = await Utilisateur.findByIdAndUpdate(id_utilisateur, req.body, {
             new: true,
             runValidators: true
