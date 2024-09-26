@@ -46,12 +46,11 @@ const TableauDepense = ({ listDepense, formatDate, onEdit, onDelete, onAdd }) =>
   return (
     <div className="overflow-x-auto">
       {/* Conteneur flex pour les actions */}
-      {/* Conteneur flex pour les actions */}
       <div className="flex flex-wrap items-center justify-between mb-4 space-x-2">
 
         {/* Bouton Ajouter */}
         <button
-          className="btn btn-primary h-10 w-32 flex border border-transparent bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition duration-200"
+          className="btn btn-primary h-10 w-32 mb-4 flex border border-transparent bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition duration-200"
           onClick={onAdd}
         >
           Ajouter
@@ -60,7 +59,7 @@ const TableauDepense = ({ listDepense, formatDate, onEdit, onDelete, onAdd }) =>
         {/* Bouton Supprimer Sélectionnés */}
         <button
           disabled={selectedDepenses.size === 0}
-          className="btn btn-danger h-10 w-40 flex items-center justify-center"
+          className="btn btn-danger mb-4 h-10 w-40 flex items-center justify-center"
           onClick={() => document.getElementById('my_modal_1').showModal()}
         >
           Supprimer Sélectionnés
@@ -70,7 +69,7 @@ const TableauDepense = ({ listDepense, formatDate, onEdit, onDelete, onAdd }) =>
         <input
           type="text"
           placeholder="Rechercher une dépense..."
-          className="input input-bordered flex-grow min-w-[150px] w-1/3"
+          className="input input-bordered  mb-4 flex-grow min-w-[150px] w-1/3"
           value={searchTerm}
           onChange={handleSearch}
         />
