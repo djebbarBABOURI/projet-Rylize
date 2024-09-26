@@ -14,7 +14,6 @@ const Inscription = () => {
     const { loading, inscription } = useInscription();
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(inputs);
         await inscription(inputs);
     }
     return (

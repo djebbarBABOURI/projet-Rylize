@@ -7,13 +7,14 @@ import { Toaster } from 'react-hot-toast';
 import { useAuthContext } from "./context/UtilisateurAuthContext";
 import Home from './pages/home/Home.jsx';
 import Profil from './pages/Profil/Profil.jsx';
-// import Navigation from './components/navbar/Navigation.jsx';
+import Unfound from './pages/Unfound/Unfound.jsx'; // Import de la page non trouvée
+
 function App() {
   const { authUtilisateur } = useAuthContext();
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      {/* <Navigation /> */}
       <div className=''>
         <Toaster
           position="top-right"
@@ -23,12 +24,14 @@ function App() {
       </div>
       {/* Conteneur pour le contenu qui doit être centré */}
       <div className="h-full w-full flex-grow flex items-center justify-center p-4">
-
         <Routes>
-          <Route path='/' element={authUtilisateur ? <Home /> : <Navigate to={"/connexion"} />} />
+          <Route path='/' element={authUtilisateur ? <Home /> : <Navigate to="/connexion" />} />
           <Route path='/inscription' element={authUtilisateur ? <Navigate to='/' /> : <Inscription />} />
           <Route path='/connexion' element={authUtilisateur ? <Navigate to='/' /> : <Connexion />} />
           <Route path='/profil' element={authUtilisateur ? <Profil /> : <Navigate to='/' />} />
+
+          {/* Gestion des routes non existantes */}
+          <Route path="*" element={<Unfound />} />
         </Routes>
       </div>
     </div>

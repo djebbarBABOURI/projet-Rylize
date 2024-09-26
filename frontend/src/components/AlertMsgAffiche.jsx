@@ -1,8 +1,6 @@
 /* eslint-disable react/prop-types */
 
 const AlertMsgAffiche = ({ message }) => {
-
-
     return (
 
         <div role="alert" className="alert alert-error mt-2">
