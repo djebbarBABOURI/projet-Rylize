@@ -1,10 +1,9 @@
-import React from 'react'
+/* eslint-disable react/prop-types */
 import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS } from "chart.js/auto"
+import "chart.js/auto"; // enregistre automatiquement les types de graphiques Chart.js
+
 function PieChart({ chartData }) {
-    return (
-        <Pie data={chartData} />
-    );
+    return <Pie data={chartData} />;
 }
 
 export default PieChart;

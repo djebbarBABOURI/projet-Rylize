@@ -1,10 +1,9 @@
-import React from 'react'
+/* eslint-disable react/prop-types */
 import { Bar } from "react-chartjs-2";
-import { Chart as ChartJS } from "chart.js/auto"
+import "chart.js/auto"; // enregistre automatiquement les types de graphiques Chart.js
+
 function BarChart({ chartData }) {
-    return (
-        <Bar data={chartData} />
-    );
+    return <Bar data={chartData} />;
 }
 
 export default BarChart;

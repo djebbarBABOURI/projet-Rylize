@@ -1,10 +1,8 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useAuthContext } from "../context/UtilisateurAuthContext";
 
 export const useModifDepense = () => {
     const [loadingModif, setLoadingModif] = useState(false);
-    const { authUtilisateur } = useAuthContext();
     const [modifDepHasError, setModifDepHasError] = useState({
         hasError: null,
         message: null,
