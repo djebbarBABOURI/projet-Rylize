@@ -1,4 +1,5 @@
 import jsonwebtoken from "jsonwebtoken";
+import config from "../config/env.js";
 import Utilisateur from "../model/utilisateur.model.js";
 
 const protectRoute = async (req, res, next) => {
@@ -8,7 +9,7 @@ const protectRoute = async (req, res, next) => {
             return res.status(401).json({ error: "Non autorisé - Aucun jeton fourni" });
         }
 
-        const decoder = jsonwebtoken.verify(token, process.env.JWT_SECRET);
+        const decoder = jsonwebtoken.verify(token, config.jwtSecret);
 
         if (!decoder) {
             return res.status(401).json({ error: "Non autorisé - Jeton invalide" });
