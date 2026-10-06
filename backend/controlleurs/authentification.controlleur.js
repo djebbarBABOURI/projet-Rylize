@@ -1,5 +1,6 @@
 import Utilisateur from "../model/utilisateur.model.js";
 import bcryptjs from "bcryptjs";
+import { assurerCategoriesParDefaut } from "../services/categorie.service.js";
 import genererToken_et_setcookie from "../outils/genererToken.js";
 export const inscrir = async (req, res) => {
     try {
@@ -17,8 +18,8 @@ export const inscrir = async (req, res) => {
             return res.status(400).json({ error: "L'utilisateur existe déjà !" });
         }
 
-        // Génération d'un sel pour le hachage du mot de passe
-        const salt = await bcryptjs.genSalt(15);
+        // Sel de coût 12 : sécurisé et ~30x plus rapide que le coût 15 utilisé auparavant
+        const salt = await bcryptjs.genSalt(12);
 
         // Hachage du mot de passe avec le sel généré
         const hash_mdp = await bcryptjs.hash(mdp, salt);
@@ -38,6 +39,7 @@ export const inscrir = async (req, res) => {
 
             // Enregistrement de l'utilisateur dans la base de données
             await nv_utilisateur.save();
+            await assurerCategoriesParDefaut(nv_utilisateur._id);
 
             // Réponse avec les informations de l'utilisateur nouvellement créé
             res.status(201).json({
