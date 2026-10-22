@@ -1,22 +1,29 @@
-import express from "express";
-import dotenv from "dotenv";
-import authRoutes from "./routes/authautification.routes.js";
-import utilisateurRoutes from "./routes/utilisateurRoutes.js";
-import connexionMongoDB from "./bdd/connexionMongoDb.js";
-import cookieParser from 'cookie-parser';
-import depenseRoutes from './routes/depense.routes.js';
-const app = express();
-dotenv.config();
-const port = process.env.PORT || 5000;
+import config from "./config/env.js";
+import app from "./app.js";
+import { connexionMongoDB, deconnexionMongoDB } from "./bdd/connexionMongoDb.js";
 
-//pour permettre d'extraire les données depuis req.body
-app.use(express.json());
-app.use(cookieParser());
+const demarrer = async () => {
+    try {
+        await connexionMongoDB();
+    } catch (error) {
+        console.error("Impossible de se connecter à MongoDB :", error.message);
+        process.exit(1);
+    }
 
-app.use("/api/authautification/", authRoutes);
-app.use("/api/utilisateur/", utilisateurRoutes);
-app.use("/api/depenses/", depenseRoutes);
-app.listen(port, () => {
-    connexionMongoDB();
-    console.log(`server running on port ${port}`);
-});
+    const serveur = app.listen(config.port, () => {
+        console.log(`Serveur démarré sur le port ${config.port} (${config.env})`);
+    });
+
+    // Arrêt propre : on ferme le serveur HTTP puis la connexion MongoDB
+    const arreter = async (signal) => {
+        console.log(`${signal} reçu, arrêt en cours...`);
+        serveur.close(async () => {
+            await deconnexionMongoDB();
+            process.exit(0);
+        });
+    };
+    process.on("SIGINT", () => arreter("SIGINT"));
+    process.on("SIGTERM", () => arreter("SIGTERM"));
+};
+
+demarrer();
