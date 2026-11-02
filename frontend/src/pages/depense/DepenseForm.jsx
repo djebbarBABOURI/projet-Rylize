@@ -2,11 +2,13 @@
 import { useState, useEffect } from "react";
 import { useAjoutDepense } from "../../hooks/useAjoutDepense";
 import { useModifDepense } from "../../hooks/useModifDepense";
+import { useCategories } from "../../hooks/useCategories";
 import AlertHandling from "../Profil/AlertHandling.jsx";
 import AlertMsgAffiche from '../../components/AlertMsgAffiche.jsx';
 const DepenseForm = ({ depense, isAjoutDepense, reloadData }) => {
     const { loadingAjout, ajoutDepense, HasError, formAjoutHasError } = useAjoutDepense();
     const { loadingModif, modifDepense, modifDepHasError, formModifHasError } = useModifDepense();
+    const { categories } = useCategories();
 
 
     const [inputs, setInputs] = useState({
@@ -27,7 +29,6 @@ const DepenseForm = ({ depense, isAjoutDepense, reloadData }) => {
                 date: depense.date || "",
                 description: depense.description || "",
             });
-            console.log(inputs);
         }
     }, [depense]);
 
@@ -110,9 +111,9 @@ const DepenseForm = ({ depense, isAjoutDepense, reloadData }) => {
 
                         >
                             <option value="" disabled>Choisir une catégorie</option>
-                            <option value="nourriture">Nourriture</option>
-                            <option value="transport">Transport</option>
-                            <option value="loisirs">Loisirs</option>
+                            {categories.map((c) => (
+                                <option key={c._id} value={c.nom} className="capitalize">{c.nom.charAt(0).toUpperCase() + c.nom.slice(1)}</option>
+                            ))}
                         </select>
                         {isAjoutDepense ? (
                             formAjoutHasError.categorie.Error && (
