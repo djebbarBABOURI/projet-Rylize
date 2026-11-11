@@ -3,6 +3,7 @@ import useModifProfil from "../../hooks/useModifProfil.js";
 import InsForm from "../inscription/InsForm.jsx";
 import AlertHandling from "./AlertHandling.jsx";
 import { useAuthContext } from "../../context/UtilisateurAuthContext";
+import ChangerMotDePasse from "../../components/ChangerMotDePasse.jsx";
 
 const Profil = () => {
     const { authUtilisateur } = useAuthContext();
@@ -113,6 +114,7 @@ const Profil = () => {
                     </div>
                 </dialog>
             </div>
+            <ChangerMotDePasse />
         </>
     );
 };
