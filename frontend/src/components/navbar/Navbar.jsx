@@ -6,6 +6,7 @@ import { useAuthContext } from "../../context/UtilisateurAuthContext.jsx";
 import { Link } from "react-router-dom";
 import { FaHome } from "react-icons/fa";
 import { AiFillProfile } from "react-icons/ai";
+import { MdOutlineSavings, MdOutlineCategory } from "react-icons/md";
 
 
 export const Navbar = () => {
@@ -78,6 +79,20 @@ export const Navbar = () => {
                                             to="/" >
                                             <FaHome className="mr-2" />
                                             <span>Accueil</span>
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link className="flex items-center py-3 px-4 text-coolGray-500  transition-colors duration-1000 hover:text-white font-medium hover:bg-blue-500 rounded-md"
+                                            to="/budgets" onClick={() => setMobileNavOpen(false)} >
+                                            <MdOutlineSavings className="mr-2" />
+                                            <span>Budgets</span>
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link className="flex items-center py-3 px-4 text-coolGray-500  transition-colors duration-1000 hover:text-white font-medium hover:bg-blue-500 rounded-md"
+                                            to="/categories" onClick={() => setMobileNavOpen(false)} >
+                                            <MdOutlineCategory className="mr-2" />
+                                            <span>Catégories</span>
                                         </Link>
                                     </li>
                                     <li>
