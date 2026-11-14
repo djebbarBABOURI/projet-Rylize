@@ -1,97 +1,113 @@
-# projet-Rylize
-test pour Rylize
-Application de Suivi des Dépenses Personnelles
-Description du projet
-L'application de suivi des dépenses personnelles permet aux utilisateurs d'enregistrer, de catégoriser, et de visualiser leurs dépenses quotidiennes. Le but est d'aider les utilisateurs à comprendre leurs habitudes de consommation à travers une interface simple et intuitive. Ils peuvent ajouter des dépenses, les visualiser sous forme de tableaux et graphiques, et analyser leurs finances personnelles.
-Fonctionnalités principales
-1.	Inscription et Connexion :
-o	Création de compte.
-o	Connexion sécurisée pour accéder aux données personnelles.
-2.	Affichage et Modification du Profil :
-o	Modification des informations personnelles (nom, prénom, adresse, photo).
-3.	Ajout de Dépenses :
-o	Interface pour ajouter une dépense avec les champs : montant, catégorie, date, et description optionnelle.
-4.	Affichage des Dépenses :
-o	Liste des dépenses récentes avec options de filtrage.
-5.	Visualisation des Données :
-o	Graphiques interactifs pour visualiser la répartition des dépenses par catégorie.
-6.	Modification et Suppression de Dépenses :
-o	Modification ou suppression des dépenses enregistrées.
+# Rylize — suivi de dépenses personnelles
 
-Bonnes Pratiques
-•	Code propre et structuré : Utilisation des conventions de nommage et de l'architecture MVC pour une meilleure lisibilité et organisation.
-•	Sécurité : Hachage des mots de passe et validation des entrées pour protéger les données sensibles.
-Utilisation de l'Application
-Pour utiliser l'application, suivez ces étapes :
-1.	Démarrage de l'application :
-Assurez-vous de lancer à la fois le frontend et le backend. Le frontend est accessible à l'adresse http://localhost:3000 tandis que le backend tourne en local sur le port configuré.
-2.	Création d'un compte :
-Si vous n'avez pas encore de compte, vous pouvez en créer un via l'interface Inscription. Remplissez vos informations personnelles pour créer un compte utilisateur.
-3.	Connexion :
-Si vous avez déjà un compte, accédez à l'application via l'interface Authentification en vous connectant avec vos identifiants.
-4.	Navigation vers la page d'accueil (Home) :
-Après vous être connecté, vous serez redirigé directement vers la page d'accueil où vous pourrez :
-o	Voir la liste complète de vos dépenses.
-o	Ajouter, modifier ou supprimer des dépenses existantes.
-o	Utiliser les filtres pour trier vos dépenses par catégorie ou par période.
-o	Voir la répartition des dépenses par catégorie grâce aux Graphes interactifs.
-5.	Gestion de votre profil :
-Depuis la page d'accueil, vous avez également la possibilité d'accéder à votre profil. Vous pourrez modifier vos informations personnelles telles que votre nom, adresse ou photo de profil.
-Cette application propose une interface intuitive et une gestion simplifiée pour vous aider à suivre vos dépenses au quotidien.
+Rylize est une application web (stack **MERN** : MongoDB, Express, React, Node.js) pour enregistrer, catégoriser et analyser ses dépenses au quotidien. Elle aide à comprendre ses habitudes de consommation grâce à des statistiques calculées par MongoDB, des graphiques et des budgets mensuels avec alertes.
 
-Instructions d'Installation et d'Exécution de l'Application Localement
-Voici les étapes détaillées pour installer et exécuter localement l'application de suivi des dépenses :
-Prérequis
-Assurez-vous d'avoir installé les outils suivants sur votre machine :
-•	Node.js (v14 ou supérieure) 
-•	npm (généralement installé avec Node.js)
-•	MongoDB (pour la base de données) 
-•	Git (pour cloner le dépôt) 
-1. Cloner le Dépôt GitHub
-Commencez par cloner le dépôt contenant le code de l'application. Cela peut inclure deux parties : frontend et backend.
+## Fonctionnalités
+
+**Comptes et sécurité**
+- Inscription, connexion et déconnexion (JWT dans un cookie `httpOnly`, mots de passe hachés avec bcrypt)
+- Profil modifiable (nom, prénom, adresse, photo) et changement de mot de passe
+- Protection de l'API : `helmet`, limitation de débit, validation des entrées, vérification de propriété des données
+
+**Dépenses**
+- Ajout, modification et suppression multiple (avec confirmation)
+- Recherche, filtre par catégorie et par période, tri et pagination, exécutés côté serveur par MongoDB
+- Export CSV compatible Excel (séparateur `;`, virgule décimale), qui reprend les filtres actifs
+
+**Catégories personnalisables**
+- Catégories propres à chaque utilisateur, avec couleur ; 6 catégories créées à l'inscription
+- Renommer une catégorie met à jour les dépenses et budgets liés
+
+**Statistiques (agrégations MongoDB)**
+- Cartes du mois : total, variation par rapport au mois précédent, moyenne par jour, projection de fin de mois, catégorie la plus coûteuse
+- Graphiques en barres, en secteurs et courbe mensuelle, colorés par catégorie
+
+**Budgets mensuels**
+- Budget global ou par catégorie, suivi avec barre de progression et statut (ok / bientôt atteint dès 80 % / dépassé)
+
+## Architecture
+
+```
+projet-Rylize/
+├── backend/                 API Express (architecture MVC)
+│   ├── config/              variables d'environnement validées au démarrage
+│   ├── bdd/                 connexion MongoDB (Mongoose)
+│   ├── model/               schémas : Utilisateur, Depense, Categorie, Budget
+│   ├── controlleurs/        logique des routes
+│   ├── services/            requêtes complexes (filtres, agrégations, budgets)
+│   ├── routes/ middleware/ outils/
+│   ├── scripts/             seed de démonstration
+│   └── tests/               tests node:test
+├── frontend/                React + Vite + Tailwind/DaisyUI + Chart.js
+├── docker-compose.yml       MongoDB (+ API, + mongo-express en option)
+└── .github/workflows/       CI : tests backend, lint et build frontend
+```
+
+### Modèle de données MongoDB
+
+| Collection | Champs principaux | Index |
+|---|---|---|
+| `utilisateurs` | nom, prenom, email, mdp (haché), adresse, imgProfil | `email` unique |
+| `depenses` | userId, montant, categorie, date, description | `{userId, date}`, `{userId, categorie, date}` |
+| `categories` | userId, nom, couleur | `{userId, nom}` unique |
+| `budgets` | userId, categorie (`null` = global), montant | `{userId, categorie}` unique |
+
+Les statistiques utilisent le pipeline d'agrégation (`$match`, `$group`, `$facet`, `$dateToString`) : un seul aller-retour vers la base pour obtenir totaux, répartition par catégorie et évolution mensuelle.
+
+## Installation
+
+Prérequis : Node.js 20+ (testé avec 22), npm et MongoDB (local, Docker ou Atlas).
+
+```bash
 git clone https://github.com/djebbarBABOURI/projet-Rylize.git
 cd projet-Rylize
-2. Configuration du Backend
-a) Installation des dépendances
-Installez les dépendances Node.js (car le fichier package.json pour le backend est au meme niveau avec le dossier de backend).
-npm install
-b) Configuration des variables d'environnement
-Créez un fichier .env dans le dossier backend et configurez les variables d'environnement nécessaires, telles que la connexion à la base de données MongoDB et le secret pour le JWT (JSON Web Token) utilisé pour l'authentification.
-Exemple de fichier .env :
-PORT=8000 
-MONGO_URI=mongodb://localhost:27017/nom-de-la-base JWT_SECRET=unSecretTresFort
+cp .env.example .env        # puis renseigner JWT_SECRET (et MONGO_DB_URI si besoin)
+npm install                 # dépendances du backend
+cd frontend && npm install  # dépendances du frontend
+```
 
-c) Lancement du serveur backend
-Après avoir installé les dépendances et configuré les variables d'environnement, démarrez le serveur backend.
-npm run server 
-Le backend devrait maintenant être accessible sur http://localhost:8000.
-3. Configuration du Frontend
-a) Installation des dépendances
-Naviguez ensuite dans le répertoire frontend et installez les dépendances nécessaires
-cd ../frontend
-npm install
-b) Lancement du serveur frontend
-Après l'installation des dépendances, lancez le serveur frontend.
-npm run dev
-Le frontend devrait maintenant être accessible sur http://localhost:3000.
-4. Utilisation de l'Application
-1.	Ouvrez votre navigateur et accédez à http://localhost:3000.
-2.	Inscription : Si vous n'avez pas encore de compte, créez-en un via l'interface d'inscription.
-3.	Connexion : Si vous avez déjà un compte, connectez-vous avec vos identifiants.
-4.	Ajouter des Dépenses : Une fois connecté, vous pourrez ajouter, modifier et supprimer des dépenses depuis la page d'accueil.
-5.	Profil : Vous pouvez également accéder à votre profil pour mettre à jour vos informations personnelles.
-5. (Optionnel) Lancement de MongoDB
-Si MongoDB n'est pas déjà démarré, assurez-vous de lancer votre serveur MongoDB localement avec :
-mongod
-6. Tests (Optionnel)
-Si des tests unitaires ou d'intégration sont inclus dans le projet, vous pouvez les exécuter avec :
-npm test
-7. Conteneurisation (Optionnel)
-Si vous utilisez Docker, vous pouvez lancer l'application via docker-compose pour démarrer le frontend, le backend, et la base de données MongoDB dans des conteneurs.
-1.	Créez un fichier docker-compose.yml pour définir les services frontend, backend, et MongoDB.
-2.	Démarrez les services avec la commande suivante :
-docker-compose up
-L'application devrait être accessible via http://localhost:3000.
-________________________________________
-L'application est maintenant prête à être utilisée localement !
+**MongoDB avec Docker** (le plus simple) : `docker compose up -d mongo` puis garder `MONGO_DB_URI=mongodb://127.0.0.1:27017/rylize`.
 
+### Lancer l'application
+
+```bash
+npm run server              # API sur http://localhost:8000 (nodemon)
+cd frontend && npm run dev  # interface sur http://localhost:3000
+```
+
+Pour tout lancer avec Docker (MongoDB + API) : `JWT_SECRET=... docker compose up -d --build`. L'interface d'administration de MongoDB est disponible avec `docker compose --profile outils up -d` (http://localhost:8081).
+
+### Données de démonstration
+
+```bash
+npm run seed
+```
+
+Crée le compte `demo@rylize.dev` / `Demo1234!` avec environ 4 mois de dépenses et des budgets.
+
+### Tests
+
+```bash
+npm test                    # 32 tests : validations, filtres, agrégations, API HTTP
+cd frontend && npm run lint && npm run build
+```
+
+Les pipelines d'agrégation sont testés en mémoire avec [mingo](https://github.com/kofrasa/mingo) et l'API avec des modèles Mongoose simulés : aucun serveur MongoDB n'est nécessaire pour lancer la suite.
+
+## API
+
+Toutes les routes, sauf `/api/sante` et l'authentification, nécessitent le cookie de connexion.
+
+| Méthode et route | Description |
+|---|---|
+| `GET /api/sante` | état de l'API et de MongoDB |
+| `POST /api/authautification/inscription` · `/connexion` · `/deconnexion` | authentification |
+| `PATCH /api/utilisateur/modifUtilisateur/:id` | modifier son profil |
+| `PATCH /api/utilisateur/motdepasse` | changer son mot de passe |
+| `GET /api/depenses/getDepenses` | liste ; filtres `categorie`, `du`, `au`, `min`, `max`, `q`, `tri`, `ordre`, `page`, `limite` |
+| `POST /api/depenses/ajoutDepense/:id` · `PATCH /modifierDepense/:id` · `DELETE /deleteDepenses` | écriture |
+| `GET /api/depenses/export` | export CSV (mêmes filtres) |
+| `GET/POST /api/categories` · `PATCH/DELETE /api/categories/:id` | catégories |
+| `GET /api/statistiques?du=&au=` | totaux, par catégorie, par mois |
+| `GET /api/statistiques/resume?mois=AAAA-MM` | résumé mensuel et comparaison |
+| `GET /api/budgets?mois=AAAA-MM` · `PUT /api/budgets` · `DELETE /api/budgets/:id` | budgets et statut |
