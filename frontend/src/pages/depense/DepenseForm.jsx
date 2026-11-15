@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useAjoutDepense } from "../../hooks/useAjoutDepense";
 import { useModifDepense } from "../../hooks/useModifDepense";
 import { useCategories } from "../../hooks/useCategories";
+import { useSuggestionCategorie } from "../../hooks/useSuggestionCategorie";
 import AlertHandling from "../Profil/AlertHandling.jsx";
 import AlertMsgAffiche from '../../components/AlertMsgAffiche.jsx';
 const DepenseForm = ({ depense, isAjoutDepense, reloadData }) => {
@@ -31,6 +32,10 @@ const DepenseForm = ({ depense, isAjoutDepense, reloadData }) => {
             });
         }
     }, [depense]);
+
+    // Suggestion de catégorie par machine learning (uniquement quand aucune catégorie n'est choisie)
+    const { suggestions, source } = useSuggestionCategorie(inputs.description, !inputs.categorie);
+    const choisirSuggestion = (nom) => setInputs((precedent) => ({ ...precedent, categorie: nom }));
 
 
     const handleChange = (e) => {
@@ -172,6 +177,24 @@ const DepenseForm = ({ depense, isAjoutDepense, reloadData }) => {
                         )
                         }
                     </div>
+                    {/* Catégorie suggérée par le modèle de machine learning */}
+                    {!inputs.categorie && suggestions.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-2 text-sm" aria-live="polite">
+                            <span className="text-gray-600">
+                                Catégorie suggérée{source === "personnalise" ? " (selon vos habitudes)" : ""} :
+                            </span>
+                            {suggestions.slice(0, 3).map((s) => (
+                                <button
+                                    type="button"
+                                    key={s.categorie}
+                                    className="badge badge-outline badge-lg cursor-pointer hover:bg-blue-600 hover:text-white capitalize"
+                                    onClick={() => choisirSuggestion(s.categorie)}
+                                >
+                                    {s.categorie} · {Math.round(s.probabilite * 100)} %
+                                </button>
+                            ))}
+                        </div>
+                    )}
                     <AlertHandling modifHasError={isAjoutDepense ? HasError : modifDepHasError} classM="modifAfficheError" />
                     {/* Button */}
                     <div>
