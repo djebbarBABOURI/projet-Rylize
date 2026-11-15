@@ -27,11 +27,31 @@ services:
       MONGO_DB_URI: mongodb://mongo:27017/rylize
       JWT_SECRET: ${JWT_SECRET:?Définir JWT_SECRET dans l'environnement ou un fichier .env}
       NODE_ENV: production
+      ML_SERVICE_URL: http://ml:8001
+      ML_SERVICE_TOKEN: ${ML_SERVICE_TOKEN:-}
     ports:
       - "8000:8000"
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:8000/api/sante"]
       interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # Service de machine learning (Python) : suggestion de catégorie, prévisions, anomalies.
+  # Il lit MongoDB en lecture seule et n'est pas exposé à l'extérieur : seule l'API Node l'appelle.
+  ml:
+    build: ./ml-service
+    container_name: rylize-ml
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      MONGO_DB_URI: mongodb://mongo:27017/rylize
+      ML_SERVICE_TOKEN: ${ML_SERVICE_TOKEN:-}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8001/sante')"]
+      interval: 20s
       timeout: 5s
       retries: 5
 
