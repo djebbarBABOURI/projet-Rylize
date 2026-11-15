@@ -6,6 +6,7 @@ import BarChart from "../../components/BarChart.jsx";
 import LineChart from "../../components/LineChart.jsx";
 import PieChart from "../../components/PieChart.jsx";
 import CartesStats from "../../components/CartesStats.jsx";
+import InsightsML from "../../components/InsightsML.jsx";
 import FiltrePeriode from "../../components/FiltrePeriode.jsx";
 import { useCategories } from "../../hooks/useCategories.js";
 import { api, construireQuery } from "../../services/api.js";
@@ -25,6 +26,7 @@ const Home = () => {
     const [categorieFiltre, setCategorieFiltre] = useState("");
     const [page, setPage] = useState(1);
     const [pagination, setPagination] = useState(null);
+    const [version, setVersion] = useState(0); // incrémentée après chaque modification pour relancer les calculs ML
     const [resume, setResume] = useState(null);
     const { categories } = useCategories();
 
@@ -82,6 +84,7 @@ const Home = () => {
     const rafraichir = useCallback(() => {
         loadData();
         loadStats();
+        setVersion((v) => v + 1);
     }, [loadData, loadStats]);
 
     // La liste se recharge quand les filtres ou la page changent, les statistiques seulement avec la période
@@ -176,6 +179,7 @@ const Home = () => {
             </div>
 
             <CartesStats resume={resume} />
+            <InsightsML bornes={bornes} version={version} />
 
             <dialog id="my_modal_4" className="modal">
                 <div className="modal-box w-11/12 max-w-5xl">
