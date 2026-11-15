@@ -8,6 +8,7 @@ import depenseRoutes from "./routes/depense.routes.js";
 import categorieRoutes from "./routes/categorie.routes.js";
 import statistiquesRoutes from "./routes/statistiques.routes.js";
 import budgetRoutes from "./routes/budget.routes.js";
+import mlRoutes from "./routes/ml.routes.js";
 import santeRoutes from "./routes/sante.routes.js";
 
 // L'application Express est séparée du démarrage du serveur pour pouvoir être testée
@@ -25,5 +26,6 @@ app.use("/api/depenses/", depenseRoutes);
 app.use("/api/categories", categorieRoutes);
 app.use("/api/statistiques", statistiquesRoutes);
 app.use("/api/budgets", budgetRoutes);
+app.use("/api/ml", mlRoutes);
 
 export default app;
