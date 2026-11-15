@@ -25,6 +25,12 @@ Rylize est une application web (stack **MERN** : MongoDB, Express, React, Node.j
 **Budgets mensuels**
 - Budget global ou par catégorie, suivi avec barre de progression et statut (ok / bientôt atteint dès 80 % / dépassé)
 
+**Machine learning** (service Python, facultatif)
+- Suggestion automatique de la catégorie pendant la saisie de la description (68,6 % de réussite en première suggestion, 88,6 % parmi les 3 propositions, sur des descriptions inconnues ; le modèle s'adapte ensuite aux habitudes de l'utilisateur)
+- Prévision du total du mois et par catégorie, avec fourchette à 80 %
+- Détection des dépenses inhabituelles
+- Détails, métriques et limites : [ml-service/README.md](ml-service/README.md). Sans ce service, l'application fonctionne normalement : les fonctions IA sont simplement masquées.
+
 ## Architecture
 
 ```
@@ -38,8 +44,9 @@ projet-Rylize/
 │   ├── routes/ middleware/ outils/
 │   ├── scripts/             seed de démonstration
 │   └── tests/               tests node:test
+├── ml-service/              service Python (FastAPI + scikit-learn) : suggestions, prévisions, anomalies
 ├── frontend/                React + Vite + Tailwind/DaisyUI + Chart.js
-├── docker-compose.yml       MongoDB (+ API, + mongo-express en option)
+├── docker-compose.yml       MongoDB + API + service ML (+ mongo-express en option)
 └── .github/workflows/       CI : tests backend, lint et build frontend
 ```
 
@@ -77,6 +84,17 @@ cd frontend && npm run dev  # interface sur http://localhost:3000
 
 Pour tout lancer avec Docker (MongoDB + API) : `JWT_SECRET=... docker compose up -d --build`. L'interface d'administration de MongoDB est disponible avec `docker compose --profile outils up -d` (http://localhost:8081).
 
+### Service de machine learning (facultatif)
+
+```bash
+cd ml-service
+python -m venv .venv && source .venv/bin/activate   # Windows : .venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --port 8001
+```
+
+Puis, dans `.env` : `ML_SERVICE_URL=http://127.0.0.1:8001`. Avec Docker, le service `ml` est lancé automatiquement par `docker compose up`.
+
 ### Données de démonstration
 
 ```bash
@@ -88,7 +106,8 @@ Crée le compte `demo@rylize.dev` / `Demo1234!` avec environ 4 mois de dépenses
 ### Tests
 
 ```bash
-npm test                    # 32 tests : validations, filtres, agrégations, API HTTP
+npm test                    # 40 tests : validations, filtres, agrégations, API HTTP, passerelle ML
+cd ml-service && python -m pytest -q   # 38 tests du service ML
 cd frontend && npm run lint && npm run build
 ```
 
@@ -107,7 +126,13 @@ Toutes les routes, sauf `/api/sante` et l'authentification, nécessitent le cook
 | `GET /api/depenses/getDepenses` | liste ; filtres `categorie`, `du`, `au`, `min`, `max`, `q`, `tri`, `ordre`, `page`, `limite` |
 | `POST /api/depenses/ajoutDepense/:id` · `PATCH /modifierDepense/:id` · `DELETE /deleteDepenses` | écriture |
 | `GET /api/depenses/export` | export CSV (mêmes filtres) |
+| `GET /api/ml/statut` · `/categorie?description=` · `/prevision?mois=` · `/anomalies?du=&au=` | fonctions de machine learning (503 si le service ML est absent) |
 | `GET/POST /api/categories` · `PATCH/DELETE /api/categories/:id` | catégories |
 | `GET /api/statistiques?du=&au=` | totaux, par catégorie, par mois |
 | `GET /api/statistiques/resume?mois=AAAA-MM` | résumé mensuel et comparaison |
 | `GET /api/budgets?mois=AAAA-MM` · `PUT /api/budgets` · `DELETE /api/budgets/:id` | budgets et statut |
+
+## Sécurité : à savoir
+
+- Le fichier `.env` ne doit jamais être versionné (il est ignoré par git). Une ancienne version contenant des identifiants figure dans l'historique du dépôt : **changez le mot de passe MongoDB Atlas et le `JWT_SECRET`** si ces valeurs ont été utilisées ailleurs.
+- En production, définir `NODE_ENV=production` (cookies `secure`) et placer l'API derrière HTTPS.
