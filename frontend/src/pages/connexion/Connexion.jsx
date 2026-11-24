@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import useConnexion from "../../hooks/useConnexion";
 
 export const Connexion = () => {
-    const [email, setEmail] = useState("");
-    const [mdp, setMdp] = useState("");
+    const [email, setEmail] = useState("demo@rylize.dev");
+    const [mdp, setMdp] = useState("Demo1234!");
     const { loading, connexion } = useConnexion();
 
     const handleSubmit = async (e) => {
