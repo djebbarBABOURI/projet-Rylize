@@ -16,6 +16,9 @@ const requete = async (url, { method = "GET", body } = {}) => {
     if (!res.ok || data?.error) {
         throw new Error(data?.error || `Erreur ${res.status} - ${res.statusText}`);
     }
+    if (data === null) {
+        throw new Error("Réponse invalide du serveur (JSON attendu)");
+    }
     return data;
 };
 
