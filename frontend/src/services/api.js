@@ -1,6 +1,7 @@
 // Petit client HTTP : JSON en entrée/sortie et erreurs lisibles (message renvoyé par l'API)
 
 const requete = async (url, { method = "GET", body } = {}) => {
+    url = url.replace(/\/(\?|$)/, "$1");
     const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
