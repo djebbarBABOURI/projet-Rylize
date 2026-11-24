@@ -13,7 +13,7 @@ import santeRoutes from "./routes/sante.routes.js";
 
 // L'application Express est séparée du démarrage du serveur pour pouvoir être testée
 const app = express();
-
+app.set("trust proxy", 1);
 app.use(helmet());
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
